@@ -1,0 +1,62 @@
+# Maven
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle (se você estivesse usando Gradle)
+.gradle/
+/build/
+
+# IDEs
+.idea/                                   # IntelliJ IDEA
+.vscode/                                 # VS Code (seus arquivos de configuração)
+*.iml                                    # IntelliJ IDEA module files
+*.ipr
+*.iws
+.project                                 # Eclipse
+.classpath                               # Eclipse
+.settings/                               # Eclipse
+.metadata/                               # Eclipse
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+*.log.*
+*.trace
+
+# Environment
+.env
+.env.*
+.DS_Store                                # macOS
+Thumbs.db                                # Windows
+
+# Compiled class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Specific to Spring Boot
+/src/main/resources/application*.properties
+/src/main/resources/application*.yml
+/src/main/resources/application*.yaml
+!/src/main/resources/application.properties.example # Se você tiver um arquivo de exemplo de config
+
+# Outros
+*.bak
+*.tmp
+*.swp
