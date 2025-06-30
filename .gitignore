@@ -51,10 +51,8 @@ Thumbs.db                                # Windows
 *.rar
 
 # Specific to Spring Boot
-/src/main/resources/application*.properties
 /src/main/resources/application*.yml
 /src/main/resources/application*.yaml
-!/src/main/resources/application.properties.example # Se você tiver um arquivo de exemplo de config
 
 # Outros
 *.bak
