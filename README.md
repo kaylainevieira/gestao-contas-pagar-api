@@ -1,88 +1,140 @@
 GestãoContasAPagar-API
+Visão Geral do Projeto
+Este projeto implementa uma API RESTful para o gerenciamento de contas a pagar, com foco em uma arquitetura modular e testável. A aplicação é desenvolvida com Spring Boot 3.x e Java 21, utilizando PostgreSQL para persistência de dados. O ambiente é orquestrado via Docker Compose, e o controle de versão do esquema de banco de dados é realizado pelo Flyway. A segurança é provida pelo Spring Security.
 
-Este projeto implementa uma API RESTful para o gerenciamento de contas a pagar, com foco em uma arquitetura modular e testável. A aplicação é desenvolvida com Spring Boot 3.x e Java 21, utilizando PostgreSQL para persistência de dados. O ambiente de desenvolvimento e execução é orquestrado via Docker Compose, e o controle de versão do esquema de banco de dados é realizado pelo Flyway. A camada de segurança é provida pelo Spring Security.
+Funcionalidades da API
+A API oferece os seguintes endpoints para gerenciar contas a pagar:
 
+Autenticação
+A API utiliza autenticação HTTP Basic.
 
+Credenciais Padrão:
 
-Arquitetura e Princípios de Design
+Usuário: admin
 
-A aplicação segue uma arquitetura em camadas clara para separar as responsabilidades:
+Senha: admin
 
-- Camada de Domínio (domain): Contém o modelo de negócio central (entidades como ContaPagar, Usuario, Role, DadosAtualizacaoConta), seus comportamentos intrínsecos e as interfaces de repositório (ContaPagarRepository, UsuarioRepository, RoleRepository).
-- Camada de Aplicação (application): Define os casos de uso da aplicação (Use Cases) e orquestra a lógica de negócio. Inclui DTOs de entrada e saída (ContaPagarRequestDTO, ContaPagarResponseDTO, ContaPagarFiltroDTO, AlterarSituacaoRequestDTO, ContaPagarCsvDTO, PageResponseDTO), mappers (ContaPagarMapper), serviços de consulta (ContaPagarQueryService) e exceções específicas da aplicação.
-- Camada de Infraestrutura (infrastructure): Contém os detalhes de implementação técnica, como a persistência de dados (implementações JPA dos repositórios), configuração de segurança (SecurityConfig, CustomUserDetailsService) e parsers de arquivo CSV (ContaPagarCsvParser).
-- Camada de Apresentação (presentation): Expõe a API REST através de controladores (ContaPagarController) e gerencia o tratamento global de exceções (GlobalExceptionHandler, ErroResponse).
-- Os testes de unidade e integração (com H2 em memória) espelham a estrutura do código de produção, garantindo a validação da funcionalidade em cada camada.
+Observação: Este usuário é criado automaticamente na migração do banco de dados (via Flyway), garantindo sua disponibilidade inicial.
 
+Comandos cURL de Exemplo
+Para acessar a API, use um cliente HTTP como curl. As credenciais (admin:admin) são passadas com -u admin:admin.
 
+1- Cadastrar Conta (POST /api/contas-a-pagar)
+curl -X POST "http://localhost:8080/api/contas-a-pagar" \
+-H "Content-Type: application/json" \
+-u admin:admin \
+-d '{
+  "dataVencimento": "2025-07-30",
+  "valor": 250.75,
+  "descricao": "Conta de Luz"
+}'
 
-Regras de Negócio Implementadas
+2- Atualizar Conta (PUT /api/contas-a-pagar/{id})
+Substitua {id} pelo UUID da conta.
 
-1. Cadastro de Conta (POST /api/contas-a-pagar)
+curl -X PUT "http://localhost:8080/api/contas-a-pagar/{id}" \
+-H "Content-Type: application/json" \
+-u admin:admin \
+-d '{
+  "dataVencimento": "2025-08-15",
+  "valor": 300.00,
+  "descricao": "Aluguel Atualizado"
+}'
 
-Esta operação permite o registro de novas contas a pagar no sistema.
+3- Alterar a Situação da Conta (PATCH /api/contas-a-pagar/{id}/situacao)
+Substitua {id} pelo UUID da conta.
 
-- Situação Inicial Padrão: Toda nova conta é automaticamente definida com a situação PENDENTE no momento de seu cadastro. Não é possível especificar uma situação inicial diferente através da API de cadastro, garantindo que o ciclo de vida da conta comece de um estado conhecido.
-- Validações de Dados de Entrada:
-    dataVencimento: Campo obrigatório. Deve ser fornecido no formato de data válido (AAAA-MM-DD).
-    valor: Campo obrigatório e deve ser um valor numérico positivo (maior que zero). Garante a integridade monetária.
-    descricao: Campo obrigatório, não pode estar em branco e possui um limite máximo de 255 caracteres. Isso assegura que a conta tenha uma identificação clara e concisa.
-- Comportamento do Sistema: Caso as validações de entrada não sejam atendidas, a requisição será rejeitada com uma resposta de erro indicando os campos inválidos.
+curl -X PATCH "http://localhost:8080/api/contas-a-pagar/{id}/situacao" \
+-H "Content-Type: application/json" \
+-u admin:admin \
+-d '{
+  "novaSituacao": "PAGA"
+}'
 
-2. Atualização de Conta (PUT /api/contas-a-pagar/{id})
+4- Listagem Paginada com Filtro (POST /api/contas-a-pagar/search)
+Filtros no corpo da requisição, paginação na URL.
 
-Esta operação permite a modificação dos dados cadastrais de uma conta existente.
+curl -X POST "http://localhost:8080/api/contas-a-pagar/search?page=0&size=10&sort=dataVencimento,asc" \
+-H "Content-Type: application/json" \
+-u admin:admin \
+-d '{
+  "dataVencimentoInicio": "2025-01-01",
+  "dataVencimentoFim": "2025-12-31",
+  "descricao": "Conta"
+}'
 
-- Restrição de Atualização por Situação: Uma conta que já se encontra na situação PAGA não pode ter seus dados cadastrais (dataVencimento, valor, descricao) alterados. Esta regra visa preservar a imutabilidade de registros financeiros já liquidados, evitando inconsistências.
-- Validações de Dados de Entrada: Os campos dataVencimento, valor e descricao estão sujeitos às mesmas validações de obrigatoriedade, formato e conteúdo aplicadas no cadastro.
-- Comportamento do Sistema: Se a conta não for encontrada, uma resposta de erro indicará a ausência do recurso. Se a regra de atualização por situação for violada (tentar atualizar uma conta PAGA), uma resposta de erro específica será retornada.
+5- Obter Conta por ID (GET /api/contas-a-pagar/{id})
+Substitua {id} pelo UUID da conta.
 
-3. Alteração da Situação da Conta (PATCH /api/contas-a-pagar/{id}/situacao)
+curl -X GET "http://localhost:8080/api/contas-a-pagar/{id}" \
+-u admin:admin
 
-Esta operação é dedicada exclusivamente à mudança do status de uma conta.
+6- Obter Valor Total Pago por Período (GET /api/contas-a-pagar/valor-total-pago)
+curl -X GET "http://localhost:8080/api/contas-a-pagar/valor-total-pago?dataPagamentoInicio=2025-07-01&dataPagamentoFim=2025-07-31" \
+-u admin:admin
 
-- Transição para PAGA: Uma conta somente pode ser alterada para a situação PAGA se sua situação atual for PENDENTE ou VENCIDA. Outras transições de estado para PAGA não são permitidas, assegurando um fluxo de pagamento controlado.
-- Atualização Consequente da Data de Pagamento: Quando uma conta é alterada para a situação PAGA, o campo dataPagamento é automaticamente preenchido com a data atual do sistema. Se a situação for alterada para qualquer outro estado (ex: CANCELADA), o campo dataPagamento será definido como NULL, garantindo a consistência entre o status e a data do pagamento.
-- Validações de Dados de Entrada: O campo novaSituacao é obrigatório e deve corresponder a um dos estados válidos (PENDENTE, PAGA, VENCIDA, CANCELADA).
-- Comportamento do Sistema: Tentativas de transições de estado inválidas (ex: pagar uma conta já PAGA) ou o fornecimento de uma situação inválida resultarão em respostas de erro.
+7- Importação de Contas a Pagar via Arquivo CSV (POST /api/contas-a-pagar/importar)
+Use a opção -F para enviar o arquivo. Substitua caminho/do/seu/arquivo.csv pelo caminho real.
 
-4. Importação de Contas a Pagar via Arquivo CSV (POST /api/contas-a-pagar/importar)
+curl -X POST "http://localhost:8080/api/contas-a-pagar/importar" \
+-u admin:admin \
+-F "file=@caminho/do/seu/arquivo.csv;type=text/csv"
 
-Este mecanismo permite o carregamento em massa de contas a partir de um arquivo CSV.
+Formato do Arquivo CSV para Importação
+O arquivo CSV deve conter um cabeçalho na primeira linha com os seguintes nomes de coluna e na ordem exata:
 
-- Validação do Arquivo: O arquivo enviado deve ser do tipo text/csv e não pode estar vazio. Arquivos com formatos incorretos ou sem conteúdo serão rejeitados.
-- Formato e Ordem das Colunas CSV: O arquivo CSV deve conter um cabeçalho na primeira linha com os seguintes nomes de coluna e na ordem exata: descricao,valor,data_vencimento,data_pagamento,situacao.
-- Campos Obrigatórios no CSV: As colunas descricao, valor e data_vencimento são obrigatórias em cada linha do CSV.
-- Validações de Dados por Linha:
-    valor: Deve ser um número positivo.
-    descricao: Não pode ser vazia.
-- Situação Padrão: Se a coluna situacao estiver vazia ou ausente em uma linha do CSV, a conta correspondente será importada com a situação PENDENTE.
-- Consistência entre Data de Pagamento e Situação:
-    Se uma data_pagamento for fornecida no CSV para uma conta, sua situacao deve ser PAGA. Caso contrário, será considerado um erro de inconsistência de dados na linha.
-    Se a situacao for PAGA no CSV, mas a data_pagamento não for fornecida, a data_pagamento será automaticamente preenchida com a data atual do sistema para aquela conta.
-- Comportamento do Sistema: Erros de formato, inconsistências de dados por linha ou violações das regras de validação do arquivo resultarão em respostas de erro detalhadas, indicando a natureza do problema.
+descricao,valor,data_vencimento,data_pagamento,situacao
 
-5. Consultas
+Exemplo de Conteúdo CSV:
 
-As operações de consulta permitem a recuperação e agregação de dados das contas a pagar.
+descricao,valor,data_vencimento,data_pagamento,situacao
+Conta de Telefone,150.75,2025-07-01,,PENDENTE
+Parcela do Carro,300.00,2025-07-10,2025-07-05,PAGA
+Aluguel Apartamento,1200.00,2025-07-20,,VENCIDA
+Assinatura Internet,50.00,2025-07-25,2025-07-25,PAGA
+Manutenção Predial,75.00,2025-08-01,,
 
-- Listagem Paginada com Filtro (POST /api/contas-a-pagar/search):
-    Filtros Obrigatórios: Esta busca exige que todos os seguintes critérios de filtro sejam fornecidos no corpo da requisição JSON: dataVencimentoInicio, dataVencimentoFim e descricao.
-    Paginação e Ordenação: A paginação (número da página, tamanho da página) e a ordenação (campo e direção) são aplicadas aos resultados, permitindo a recuperação eficiente de grandes volumes de dados.
-- Obter Conta por ID (GET /api/contas-a-pagar/{id}):
-    Recupera os dados completos de uma única conta a pagar, identificada por seu UUID na URL.
-- Obter Valor Total Pago por Período (GET /api/contas-a-pagar/valor-total-pago):
-    Filtros Obrigatórios: As datas dataPagamentoInicio e dataPagamentoFim são obrigatórias e definem o intervalo para a soma dos valores.
-    Restrição de Período: A dataPagamentoInicio não pode ser posterior à dataPagamentoFim.
+Regras de Negócio e Restrições
+As operações da API seguem regras específicas para garantir a consistência dos dados:
 
+Cadastro de Conta
+Toda nova conta é criada com a situação PENDENTE.
 
+dataVencimento, valor, descricao são obrigatórios. valor deve ser positivo, descricao não pode ser vazia (máximo 255 caracteres).
+
+Atualização de Conta
+Uma conta na situação PAGA não pode ter seus dados cadastrais (dataVencimento, valor, descricao) alterados.
+
+Os campos dataVencimento, valor, descricao têm as mesmas validações do cadastro.
+
+dataPagamento e situacao não são editáveis via este endpoint.
+
+Alteração da Situação da Conta
+Uma conta só pode ser alterada para PAGA se estiver PENDENTE ou VENCIDA.
+
+Ao mudar para PAGA, dataPagamento é preenchida com a data atual do sistema.
+
+Se a situação for alterada para outro estado (ex: CANCELADA), dataPagamento é definida como NULL.
+
+novaSituacao é obrigatória e deve ser um dos estados válidos (PENDENTE, PAGA, VENCIDA, CANCELADA).
+
+Importação de Contas via CSV
+O arquivo deve ser text/csv e não pode estar vazio.
+
+As colunas descricao, valor, data_vencimento são obrigatórias em cada linha do CSV.
+
+valor deve ser positivo, descricao não pode ser vazia.
+
+Se situacao estiver vazia no CSV, a conta é importada como PENDENTE.
+
+Se data_pagamento for fornecida no CSV, situacao deve ser PAGA. Caso contrário, é um erro.
+
+Se situacao for PAGA no CSV e data_pagamento estiver vazia, data_pagamento é preenchida com a data atual.
+
+Consultas
+Listagem Paginada com Filtro: Exige que todos os filtros (dataVencimentoInicio, dataVencimentoFim, descricao) sejam fornecidos.
+
+Valor Total Pago por Período: As datas dataPagamentoInicio e dataPagamentoFim são obrigatórias e dataPagamentoInicio não pode ser posterior a dataPagamentoFim.
 
 Autenticação e Autorização
-
-A API utiliza Spring Security para autenticação e autorização via HTTP Basic.
-
-- Papéis (Roles): O sistema define papéis de usuário como ROLE_ADMIN (com acesso total a todas as operações) e ROLE_USER (com acesso limitado a operações específicas de consulta e cadastro).
-- Usuário Padrão: Um usuário admin com senha admin (codificada) é criado na migração inicial do banco de dados para facilitar testes e desenvolvimento.
-- Regras de Autorização: As permissões para cada endpoint (ex: POST /api/contas-a-pagar exige ROLE_USER ou ROLE_ADMIN; PUT /api/contas-a-pagar/{id} exige ROLE_ADMIN) são definidas na configuração de segurança.
-
-
+A API utiliza Spring Security para controle de acesso. As permissões para cada endpoint (ex: POST /api/contas-a-pagar exige ROLE_USER ou ROLE_ADMIN; PUT /api/contas-a-pagar/{id} exige ROLE_ADMIN) são definidas na configuração de segurança.
