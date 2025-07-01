@@ -10,11 +10,11 @@ A API utiliza autenticação HTTP Basic.
 - Credenciais Padrão:
 
   - Usuário:
-  bash
+   bash
   admin
 
   - Senha:
-  bash
+   bash
   admin
 
 ### Observação: Este usuário é criado automaticamente na migração do banco de dados (via Flyway), garantindo sua disponibilidade inicial.
@@ -24,7 +24,7 @@ Para acessar a API, use um cliente HTTP como curl. As credenciais (admin:admin) 
 
 ### 1- Cadastrar Conta (POST /api/contas-a-pagar)
 
-bash
+ bash
 curl -X POST "http://localhost:8080/api/contas-a-pagar" \
 -H "Content-Type: application/json" \
 -u admin:admin \
@@ -37,7 +37,7 @@ curl -X POST "http://localhost:8080/api/contas-a-pagar" \
 ### 2- Atualizar Conta (PUT /api/contas-a-pagar/{id})
 Substitua {id} pelo UUID da conta.
 
-bash
+ bash
 curl -X PUT "http://localhost:8080/api/contas-a-pagar/{id}" \
 -H "Content-Type: application/json" \
 -u admin:admin \
@@ -50,7 +50,7 @@ curl -X PUT "http://localhost:8080/api/contas-a-pagar/{id}" \
 ### 3- Alterar a Situação da Conta (PATCH /api/contas-a-pagar/{id}/situacao)
 Substitua {id} pelo UUID da conta.
 
-bash
+ bash
 curl -X PATCH "http://localhost:8080/api/contas-a-pagar/{id}/situacao" \
 -H "Content-Type: application/json" \
 -u admin:admin \
@@ -61,7 +61,7 @@ curl -X PATCH "http://localhost:8080/api/contas-a-pagar/{id}/situacao" \
 ### 4- Listagem Paginada com Filtro (POST /api/contas-a-pagar/search)
 Filtros no corpo da requisição, paginação na URL.
 
-bash
+ bash
 curl -X POST "http://localhost:8080/api/contas-a-pagar/search?page=0&size=10&sort=dataVencimento,asc" \
 -H "Content-Type: application/json" \
 -u admin:admin \
@@ -74,20 +74,20 @@ curl -X POST "http://localhost:8080/api/contas-a-pagar/search?page=0&size=10&sor
 ### 5- Obter Conta por ID (GET /api/contas-a-pagar/{id})
 Substitua {id} pelo UUID da conta.
 
-bash
+ bash
 curl -X GET "http://localhost:8080/api/contas-a-pagar/{id}" \
 -u admin:admin
 
 ### 6- Obter Valor Total Pago por Período (GET /api/contas-a-pagar/valor-total-pago)
 
-bash
+ bash
 curl -X GET "http://localhost:8080/api/contas-a-pagar/valor-total-pago?dataPagamentoInicio=2025-07-01&dataPagamentoFim=2025-07-31" \
 -u admin:admin
 
 ### 7- Importação de Contas a Pagar via Arquivo CSV (POST /api/contas-a-pagar/importar)
 Use a opção -F para enviar o arquivo. Substitua caminho/do/seu/arquivo.csv pelo caminho real.
 
-bash
+ bash
 curl -X POST "http://localhost:8080/api/contas-a-pagar/importar" \
 -u admin:admin \
 -F "file=@caminho/do/seu/arquivo.csv;type=text/csv"
@@ -95,12 +95,12 @@ curl -X POST "http://localhost:8080/api/contas-a-pagar/importar" \
 ### Formato do Arquivo CSV para Importação
 O arquivo CSV deve conter um cabeçalho na primeira linha com os seguintes nomes de coluna e na ordem exata:
 
-bash
+ bash
 descricao,valor,data_vencimento,data_pagamento,situacao
 
 Exemplo de Conteúdo CSV:
 
-bash
+ bash
 descricao,valor,data_vencimento,data_pagamento,situacao
 Conta de Telefone,150.75,2025-07-01,,PENDENTE
 Parcela do Carro,300.00,2025-07-10,2025-07-05,PAGA
