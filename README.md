@@ -19,6 +19,7 @@ A aplicação segue uma arquitetura em camadas clara para separar as responsabil
 Regras de Negócio Implementadas
 
 1. Cadastro de Conta (POST /api/contas-a-pagar)
+
 Esta operação permite o registro de novas contas a pagar no sistema.
 
 - Situação Inicial Padrão: Toda nova conta é automaticamente definida com a situação PENDENTE no momento de seu cadastro. Não é possível especificar uma situação inicial diferente através da API de cadastro, garantindo que o ciclo de vida da conta comece de um estado conhecido.
@@ -29,6 +30,7 @@ Esta operação permite o registro de novas contas a pagar no sistema.
 - Comportamento do Sistema: Caso as validações de entrada não sejam atendidas, a requisição será rejeitada com uma resposta de erro indicando os campos inválidos.
 
 2. Atualização de Conta (PUT /api/contas-a-pagar/{id})
+
 Esta operação permite a modificação dos dados cadastrais de uma conta existente.
 
 - Restrição de Atualização por Situação: Uma conta que já se encontra na situação PAGA não pode ter seus dados cadastrais (dataVencimento, valor, descricao) alterados. Esta regra visa preservar a imutabilidade de registros financeiros já liquidados, evitando inconsistências.
@@ -36,6 +38,7 @@ Esta operação permite a modificação dos dados cadastrais de uma conta existe
 - Comportamento do Sistema: Se a conta não for encontrada, uma resposta de erro indicará a ausência do recurso. Se a regra de atualização por situação for violada (tentar atualizar uma conta PAGA), uma resposta de erro específica será retornada.
 
 3. Alteração da Situação da Conta (PATCH /api/contas-a-pagar/{id}/situacao)
+
 Esta operação é dedicada exclusivamente à mudança do status de uma conta.
 
 - Transição para PAGA: Uma conta somente pode ser alterada para a situação PAGA se sua situação atual for PENDENTE ou VENCIDA. Outras transições de estado para PAGA não são permitidas, assegurando um fluxo de pagamento controlado.
@@ -44,6 +47,7 @@ Esta operação é dedicada exclusivamente à mudança do status de uma conta.
 - Comportamento do Sistema: Tentativas de transições de estado inválidas (ex: pagar uma conta já PAGA) ou o fornecimento de uma situação inválida resultarão em respostas de erro.
 
 4. Importação de Contas a Pagar via Arquivo CSV (POST /api/contas-a-pagar/importar)
+
 Este mecanismo permite o carregamento em massa de contas a partir de um arquivo CSV.
 
 - Validação do Arquivo: O arquivo enviado deve ser do tipo text/csv e não pode estar vazio. Arquivos com formatos incorretos ou sem conteúdo serão rejeitados.
@@ -59,6 +63,7 @@ Este mecanismo permite o carregamento em massa de contas a partir de um arquivo 
 - Comportamento do Sistema: Erros de formato, inconsistências de dados por linha ou violações das regras de validação do arquivo resultarão em respostas de erro detalhadas, indicando a natureza do problema.
 
 5. Consultas
+
 As operações de consulta permitem a recuperação e agregação de dados das contas a pagar.
 
 - Listagem Paginada com Filtro (POST /api/contas-a-pagar/search):
@@ -73,6 +78,7 @@ As operações de consulta permitem a recuperação e agregação de dados das c
 
 
 Autenticação e Autorização
+
 A API utiliza Spring Security para autenticação e autorização via HTTP Basic.
 
 - Papéis (Roles): O sistema define papéis de usuário como ROLE_ADMIN (com acesso total a todas as operações) e ROLE_USER (com acesso limitado a operações específicas de consulta e cadastro).
