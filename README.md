@@ -84,9 +84,9 @@ Substitua {id} pelo UUID da conta.
 ```
 curl -X GET "http://localhost:8080/api/contas-a-pagar/{id}" \
 -u admin:admin
+```
 
 ### 6- Obter Valor Total Pago por Período (GET /api/contas-a-pagar/valor-total-pago)
-```
 
 ```
 curl -X GET "http://localhost:8080/api/contas-a-pagar/valor-total-pago?dataPagamentoInicio=2025-07-01&dataPagamentoFim=2025-07-31" \
