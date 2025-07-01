@@ -19,5 +19,4 @@ public class ContaPagarResponseDTO {
     private String descricao;
     private SituacaoConta situacao;
     private OffsetDateTime dataCadastro;
-    private OffsetDateTime dataAtualizacao;
 }

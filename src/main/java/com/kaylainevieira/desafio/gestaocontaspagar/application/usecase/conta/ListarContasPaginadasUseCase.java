@@ -8,6 +8,7 @@ import com.kaylainevieira.desafio.gestaocontaspagar.domain.repository.ContaPagar
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ public class ListarContasPaginadasUseCase implements IListarContasPaginadasUseCa
     private final ContaPagarRepository contaPagarRepository;
     private final ContaPagarMapper contaPagarMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public PageResponseDTO<ContaPagarResponseDTO> execute(ContaPagarFiltroDTO filtro, Pageable pageable) {
         var contasPage = contaPagarRepository.findByDataVencimentoBetweenAndDescricaoContainingIgnoreCase(

@@ -30,7 +30,7 @@
 		<java.version>21</java.version>
 		<lombok.version>1.18.30</lombok.version>
 		<flyway.version>10.13.0</flyway.version>
-		<springdoc.version>2.3.0</springdoc.version> <!-- VERSÃO ALTERADA AQUI -->
+		<springdoc.version>2.3.0</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -94,6 +94,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.11.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -16,7 +16,6 @@ public class ContaPagarMapper {
                 .descricao(conta.getDescricao())
                 .situacao(conta.getSituacao())
                 .dataCadastro(conta.getDataCadastro())
-                .dataAtualizacao(conta.getDataAtualizacao())
                 .build();
     }
 }

@@ -50,10 +50,6 @@ public class ContaPagar {
     @Builder.Default
     private OffsetDateTime dataCadastro = OffsetDateTime.now();
 
-    @Column(name = "data_atualizacao")
-    @UpdateTimestamp
-    private OffsetDateTime dataAtualizacao;
-
     public void atualizarDadosCadastrais(DadosAtualizacaoConta dadosAtualizacao) {
         if (this.situacao == SituacaoConta.PAGA) {
             throw new ContaPagarRegraDeNegocioException("Não é possível atualizar os dados de uma conta que já foi paga.");

@@ -9,6 +9,7 @@ import com.kaylainevieira.desafio.gestaocontaspagar.domain.repository.ContaPagar
 import com.kaylainevieira.desafio.gestaocontaspagar.infrastructure.csv.ContaPagarCsvParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class ImportarContasCsvUseCase implements IImportarContasCsvUseCase {
     private final ContaPagarMapper contaPagarMapper;
 
     @Override
+    @Transactional
     public List<ContaPagarResponseDTO> execute(MultipartFile file) {
         if (file.isEmpty()) {
             throw new ContaPagarCsvException("O arquivo CSV para importação está vazio.");

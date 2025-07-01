@@ -5,6 +5,7 @@ import com.kaylainevieira.desafio.gestaocontaspagar.application.mapper.ContaPaga
 import com.kaylainevieira.desafio.gestaocontaspagar.application.query.ContaPagarQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class ObterContaPorIdUseCase implements IObterContaPorIdUseCase {
     private final ContaPagarMapper contaPagarMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public ContaPagarResponseDTO execute(UUID id) {
         var conta = contaPagarQueryService.buscarContaPagarPorId(id);
         return contaPagarMapper.toContaPagarResponseDTO(conta);
