@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ContaPagarNaoEncontradaException.class)
-    public ResponseEntity<Object> handleNotFoundException(ContaPagarNaoEncontradaException ex, WebRequest request) {
+    public ResponseEntity<Object> handleContaPagarNaoEncontradaException(ContaPagarNaoEncontradaException ex, WebRequest request) {
         return new ResponseEntity<>(
                 ErroResponse.builder()
                         .timestamp(LocalDateTime.now())
