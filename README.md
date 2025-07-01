@@ -3,6 +3,7 @@ GestãoContasAPagar-API
 Este projeto implementa uma API RESTful para o gerenciamento de contas a pagar, com foco em uma arquitetura modular e testável. A aplicação é desenvolvida com Spring Boot 3.x e Java 21, utilizando PostgreSQL para persistência de dados. O ambiente de desenvolvimento e execução é orquestrado via Docker Compose, e o controle de versão do esquema de banco de dados é realizado pelo Flyway. A camada de segurança é provida pelo Spring Security.
 
 
+
 Arquitetura e Princípios de Design
 
 A aplicação segue uma arquitetura em camadas clara para separar as responsabilidades:
@@ -12,6 +13,7 @@ A aplicação segue uma arquitetura em camadas clara para separar as responsabil
 - Camada de Infraestrutura (infrastructure): Contém os detalhes de implementação técnica, como a persistência de dados (implementações JPA dos repositórios), configuração de segurança (SecurityConfig, CustomUserDetailsService) e parsers de arquivo CSV (ContaPagarCsvParser).
 - Camada de Apresentação (presentation): Expõe a API REST através de controladores (ContaPagarController) e gerencia o tratamento global de exceções (GlobalExceptionHandler, ErroResponse).
 - Os testes de unidade e integração (com H2 em memória) espelham a estrutura do código de produção, garantindo a validação da funcionalidade em cada camada.
+
 
 
 Regras de Negócio Implementadas
@@ -67,6 +69,7 @@ As operações de consulta permitem a recuperação e agregação de dados das c
 - Obter Valor Total Pago por Período (GET /api/contas-a-pagar/valor-total-pago):
     Filtros Obrigatórios: As datas dataPagamentoInicio e dataPagamentoFim são obrigatórias e definem o intervalo para a soma dos valores.
     Restrição de Período: A dataPagamentoInicio não pode ser posterior à dataPagamentoFim.
+
 
 
 Autenticação e Autorização
